@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+
+  consumer:
+    image: consumer
+    build:
+      context: consumer
+      dockerfile: Dockerfile
+    environment:
+      DOCKER_LAMBDA_WATCH: 1
+      DOCKER_LAMBDA_STAY_OPEN: 1
+    ports:
+      - 9001:8080
+    volumes:
+      - ./consumer/lib:/var/task
+    networks:
+      - webproxy
+
+  postgres:
+    image: postgres:11
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db/:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_PASSWORD: test
+      POSTGRES_USER: test
+      POSTGRES_DB: test
+    networks:
+      - webproxy
+
+networks:
+  webproxy:
+    driver: bridge
